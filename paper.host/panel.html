@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Forge.host – Dashboard</title>
+
+<style>
+:root {
+  --bg: #121212;
+  --panel: #1a1a1a;
+  --panel-border: #2a2a2a;
+  --text: #f0f0f0;
+  --muted: #a3a3a3;
+  --accent: #c86b6b;
+  --accent-soft: #b55a5a;
+  --accent-hover: #d97b7b;
+  --sidebar-width: 260px;
+}
+
+* { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+body { margin: 0; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+
+/* Navbar */
+.navbar { 
+  height: 64px; 
+  background: #151515; 
+  display: flex; 
+  align-items: center; 
+  padding: 0 24px; 
+  border-bottom: 1px solid #262626;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.brand { font-weight: 700; font-size: 18px; color: var(--accent); cursor: pointer; }
+.nav-links { margin-left: 32px; display: flex; gap: 24px; color: var(--muted); font-size: 14px; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+.user-pill { display: flex; align-items: center; gap: 10px; background: #222; padding: 6px 12px; border-radius: 8px; font-size: 13px; border: 1px solid var(--panel-border); }
+
+/* Layout */
+.layout { display: flex; flex: 1; }
+
+/* Sidebar */
+.sidebar { 
+  width: var(--sidebar-width); 
+  background: #151515; 
+  border-right: 1px solid #262626; 
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+.sidebar-user { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.avatar-circle { width: 40px; height: 40px; background: #2a2a2a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.nav-group-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; margin-bottom: 10px; }
+.nav-item { 
+  display: block; 
+  padding: 10px 12px; 
+  color: var(--muted); 
+  text-decoration: none; 
+  font-size: 14px; 
+  border-radius: 8px; 
+  transition: 0.2s;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+.nav-item:hover { background: #1a1a1a; color: var(--text); }
+.nav-item.active { background: rgba(200, 107, 107, 0.1); color: var(--accent); border-left: 3px solid var(--accent); }
+
+/* Main Content */
+.content { flex: 1; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+.dash-header { margin-bottom: 30px; }
+.dash-header h2 { margin: 0; font-size: 28px; }
+.dash-header p { color: var(--muted); margin: 5px 0 0; }
+
+/* Promo Banner */
+.promo-banner {
+  background: linear-gradient(90deg, #1d1d1d, #161616);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+.promo-content { display: flex; gap: 20px; align-items: center; }
+.promo-icon { background: rgba(76, 175, 80, 0.1); color: #4caf50; padding: 12px; border-radius: 10px; font-size: 20px; }
+.create-now-btn { background: #4caf50; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: 0.2s; border:none; cursor:pointer;}
+.create-now-btn:hover { background: #45a049; transform: translateY(-1px); }
+
+/* Tabs */
+.tabs { display: flex; gap: 30px; border-bottom: 1px solid var(--panel-border); margin-bottom: 30px; }
+.tab { padding-bottom: 12px; color: var(--muted); cursor: pointer; font-size: 14px; position: relative; }
+.tab.active { color: var(--accent); }
+.tab.active::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--accent); }
+
+/* Views and Cards */
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+.account-card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 12px; padding: 30px; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; }
+.info-item { background: #121212; border: 1px solid #262626; padding: 16px; border-radius: 10px; display: flex; align-items: center; gap: 15px; }
+.info-icon { color: var(--accent); font-weight: bold; width: 20px; text-align: center; }
+.info-label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+.info-value { font-size: 14px; color: var(--text); font-weight: 500; }
+
+/* Forms */
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+.form-group input { width: 100%; background: #121212; border: 1px solid var(--panel-border); padding: 12px; border-radius: 8px; color: white; }
+.btn-save { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+.logout-btn { color: #ff6b6b !important; margin-top: auto; }
+.logout-btn:hover { background: rgba(255, 107, 107, 0.1) !important; }
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+  <div class="brand" onclick="switchView('Dashboard')">Forge.host</div>
+  <div class="nav-links">
+    <div style="cursor:pointer">Servers</div>
+    <div style="cursor:pointer">Blogs</div>
+    <div style="cursor:pointer">Tools</div>
+  </div>
+  <div class="nav-right">
+    <div class="user-pill">
+      <div style="width:8px; height:8px; background:#4caf50; border-radius:50%"></div>
+      <span id="nav-username">Loading...</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-user">
+      <div class="avatar-circle">👤</div>
+      <div>
+        <div id="side-username" style="font-weight:600; font-size:14px">User</div>
+        <div id="side-email" style="font-size:11px; color:var(--muted)">email@example.com</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="nav-group-label">Navigation</div>
+      <a class="nav-item active side-link" onclick="switchView('Dashboard', this)">Dashboard</a>
+      <a class="nav-item side-link" onclick="switchView('Add Server', this)">Add Server</a>
+      <a class="nav-item side-link" onclick="switchView('My Servers', this)">My Servers</a>
+    </div>
+
+    <a onclick="logout()" class="nav-item logout-btn">Logout</a>
+  </div>
+
+  <div class="content">
+    <div class="dash-header">
+      <h2 id="page-title">Dashboard</h2>
+      <p id="welcome-msg">Welcome back</p>
+    </div>
+
+    <div id="promo-section" class="promo-banner">
+      <div class="promo-content">
+        <div class="promo-icon">📦</div>
+        <div>
+          <div style="font-weight:700; font-size:16px;">Create a Free Eaglercraft Server <span style="background:#4caf50; color:#fff; font-size:10px; padding:2px 6px; border-radius:4px; margin-left:5px;">FREE</span></div>
+          <div style="color:var(--muted); font-size:13px; margin-top:4px;">Host your own server instantly with Forge.host - No credit card required</div>
+        </div>
+      </div>
+      <button onclick="switchView('Add Server')" class="create-now-btn">🚀 Create Now</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(0)">Account Overview</div>
+      <div class="tab" onclick="switchTab(1)">Change Password</div>
+      <div class="tab" onclick="switchTab(2)">Change Email</div>
+    </div>
+
+    <div id="tab-overview" class="view-section active">
+      <div class="account-card">
+        <div class="sidebar-user">
+          <div class="avatar-circle" style="width:60px; height:60px; font-size:24px;">👤</div>
+          <div>
+            <div id="card-username" style="font-weight:700; font-size:20px">User</div>
+            <div id="card-email" style="color:var(--muted)">email@example.com</div>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-icon">#</div>
+            <div><div class="info-label">User ID</div><div id="display-id" class="info-value">--------</div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon">👤</div>
+            <div><div class="info-label">Username</div><div id="display-user" class="info-value">--------</div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon">✉️</div>
+            <div><div class="info-label">Email</div><div id="display-email" class="info-value">--------</div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon">📅</div>
+            <div><div class="info-label">Account Created</div><div id="display-date" class="info-value">--------</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-password" class="view-section">
+      <div class="account-card">
+        <h3>Security Settings</h3>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="new-password" placeholder="••••••••">
+        </div>
+        <button class="btn-save" onclick="updatePassword()">Update Password</button>
+      </div>
+    </div>
+
+    <div id="tab-email" class="view-section">
+      <div class="account-card">
+        <h3>Update Email Address</h3>
+        <div class="form-group">
+          <label>New Email</label>
+          <input type="email" id="new-email-input" placeholder="newemail@example.com">
+        </div>
+        <button class="btn-save" onclick="updateEmail()">Save Changes</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // --- DATA MANAGEMENT ---
+  let currentUserKey = localStorage.getItem("currentUser");
+
+  // Mock data for demo if no user exists
+  if (!currentUserKey) {
+      currentUserKey = "demo_user";
+      const demoData = {
+          username: "ForgeTester",
+          email: "demo@forge.host",
+          id: "FG-88291",
+          joined: "October 2023",
+          password: "password123"
+      };
+      localStorage.setItem("currentUser", "demo_user");
+      localStorage.setItem("demo_user", JSON.stringify(demoData));
+  }
+
+  function loadUserData() {
+    const userData = JSON.parse(localStorage.getItem(currentUserKey));
+    if (userData) {
+      document.getElementById("nav-username").innerText = userData.username;
+      document.getElementById("side-username").innerText = userData.username;
+      document.getElementById("side-email").innerText = userData.email;
+      document.getElementById("welcome-msg").innerText = `Welcome back, ${userData.username}`;
+      document.getElementById("card-username").innerText = userData.username;
+      document.getElementById("card-email").innerText = userData.email;
+      document.getElementById("display-id").innerText = userData.id || 'N/A';
+      document.getElementById("display-user").innerText = userData.username;
+      document.getElementById("display-email").innerText = userData.email;
+      document.getElementById("display-date").innerText = userData.joined || 'Unknown';
+    }
+  }
+
+  // --- NAVIGATION LOGIC ---
+  function switchView(viewName, element) {
+    document.getElementById("page-title").innerText = viewName;
+    
+    // Manage active sidebar state
+    document.querySelectorAll('.side-link').forEach(link => link.classList.remove('active'));
+    if(element) element.classList.add('active');
+
+    // Show/Hide promo banner based on view
+    const promo = document.getElementById('promo-section');
+    promo.style.display = (viewName === 'Dashboard') ? 'flex' : 'none';
+
+    // In a real app, you'd swap content here. For now, we just update the title.
+    if(viewName !== 'Dashboard') {
+        alert("Navigated to " + viewName + ". This page is ready for content!");
+    }
+  }
+
+  function switchTab(index) {
+    const tabs = document.querySelectorAll('.tab');
+    const sections = document.querySelectorAll('.view-section');
+    
+    tabs.forEach(t => t.classList.remove('active'));
+    sections.forEach(s => s.classList.remove('active'));
+    
+    tabs[index].classList.add('active');
+    sections[index].classList.add('active');
+  }
+
+  // --- ACTIONS ---
+  function updateEmail() {
+    const newEmail = document.getElementById('new-email-input').value;
+    if(!newEmail.includes('@')) return alert("Enter a valid email");
+    
+    let data = JSON.parse(localStorage.getItem(currentUserKey));
+    data.email = newEmail;
+    localStorage.setItem(currentUserKey, JSON.stringify(data));
+    
+    loadUserData();
+    alert("Email updated successfully!");
+    switchTab(0);
+  }
+
+  function updatePassword() {
+    const newPass = document.getElementById('new-password').value;
+    if(newPass.length < 6) return alert("Password too short!");
+    
+    let data = JSON.parse(localStorage.getItem(currentUserKey));
+    data.password = newPass;
+    localStorage.setItem(currentUserKey, JSON.stringify(data));
+    
+    alert("Password updated!");
+    switchTab(0);
+  }
+
+  function logout() {
+    if(confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("currentUser");
+        window.location.reload(); // Reloads to show Demo Mode or redirect
+    }
+  }
+
+  // Initial Load
+  loadUserData();
+</script>
+
+</body>
+</html>
